@@ -1,0 +1,71 @@
+package login;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class login1 {
+
+	public static void main(String[] args) throws Throwable {
+		System.setProperty("webdriver.chrome.driver","D:\\downloads\\chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+		driver.manage().deleteAllCookies();
+		
+		driver.manage().window().maximize();
+		
+	    File src = new File("C:\\Users\\ituser004\\Desktop\\login_functionality.xlsx");
+	    FileInputStream fis = new FileInputStream(src);
+	   
+	    XSSFWorkbook wb = new XSSFWorkbook(fis);
+	    XSSFSheet sheet1=wb.getSheetAt(0);
+	    int rowcount=sheet1.getLastRowNum();
+	    System.out.println("total row: " +rowcount);
+	    for(int i=1;i<=rowcount;i++)
+	    {
+	    	String data0= sheet1.getRow(i).getCell(0).getStringCellValue();
+		    System.out.println("Username of row "+i+" is "+data0);
+		    String data1= sheet1.getRow(i).getCell(1).getStringCellValue();
+		    System.out.println("Password of row "+i+" is "+data1);
+		    Thread.sleep(4000);
+		    driver.get("https://www.kleeto.in/loginnew.php");
+		    Thread.sleep(3000);
+		   
+		    driver.findElement(By.name("username")).sendKeys(data0);
+		    driver.findElement(By.name("password")).sendKeys(data1);
+		    driver.findElement(By.name("submit")).click();
+		    Thread.sleep(3000);
+		    String x=driver.getTitle();
+		    System.out.println("Title is "+x);
+		    Thread.sleep(2000);
+		    FileOutputStream fout = new FileOutputStream(src);
+		   
+		    if(x.equals("Kleeto - PJMS - Dashboard"))
+		    {
+		    	System.out.println("login successful");
+		    	sheet1.getRow(i).createCell(2).setCellValue("Pass");
+		    	 driver.findElement(By.xpath("//img[@class='pull-right img-rounded']")).click();
+				 driver.findElement(By.xpath("//a[@class='clearfix bg-master-lighter dropdown-item']")).click();
+		    }
+		    else
+		    {
+		    	sheet1.getRow(i).createCell(2).setCellValue("Fail");
+		    	System.out.println("login failed");
+		    }
+		   wb.write(fout);
+		    Thread.sleep(3000);
+	    }
+	    
+	     
+	   
+  	  
+  	    
+	}
+
+}
